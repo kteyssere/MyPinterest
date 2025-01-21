@@ -12,7 +12,12 @@
 #### Création du vagrantfile
     - Le Vagrantfile configure une machine virtuelle nommée `mypinterestVM`
 
-
+    - dans backend/: 
 ```bash
     docker build -t symfony-backend:v1 .
+```
+
+    - dans frontend/: 
+```bash
+    docker build -t angular-frontend:v1 .
 ```
