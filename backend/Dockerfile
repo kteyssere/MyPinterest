@@ -38,4 +38,4 @@ RUN chown -R www-data:www-data /var/www/html \
 EXPOSE 8000
 
 # Commande par défaut pour démarrer Symfony
-CMD ["symfony", "serve", "--no-tls", "--port=8000", "--allow-all-hosts"]
+CMD ["symfony", "serve", "--no-tls", "--port=8000", "--allow-all-ip"]

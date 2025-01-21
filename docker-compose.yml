@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     container_name: symfony-backend
     ports:
-      - "8080:8000"
+      - "8000:8000"
     volumes:
       - ./backend:/var/www/html
     environment:
