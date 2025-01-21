@@ -16,10 +16,10 @@ COPY . .
 # Construire l'application Angular pour la production
 RUN npm run build --prod
 
-# Étape 2 : Servir l'application avec NGINX
+# Étape 2 : Servir l'application Angular avec NGINX
 FROM nginx:latest
 
-# Copier les fichiers compilés d'Angular vers NGINX
+# Copier les fichiers compilés d'Angular vers le répertoire HTML de NGINX
 COPY --from=build /usr/src/app/dist /usr/share/nginx/html
 
 # Exposer le port 80 pour accéder à l'application
