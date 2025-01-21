@@ -14,6 +14,10 @@ RUN apt-get update && apt-get install -y \
 # Installer Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
+# Installer Symfony CLI
+RUN curl -sS https://get.symfony.com/cli/installer | bash \
+    && mv /root/.symfony*/bin/symfony /usr/local/bin/symfony
+
 # Définir le répertoire de travail
 WORKDIR /var/www/html
 
@@ -24,14 +28,14 @@ COPY . .
 RUN ls -la /var/www/html
 
 # Installer les dépendances Symfony
-RUN COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader
+RUN COMPOSER_ALLOW_SUPERUSER=1 composer install
 
 # Donner les permissions nécessaires
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
 
-# Exposer le port 9000 pour PHP-FPM
-EXPOSE 9000
+# Exposer le port utilisé par Symfony (8000 par défaut)
+EXPOSE 8000
 
-# Commande par défaut pour démarrer PHP-FPM
-CMD ["php-fpm"]
+# Commande par défaut pour démarrer Symfony
+CMD ["symfony", "serve", "--no-tls", "--port=8000", "--allow-all-hosts"]

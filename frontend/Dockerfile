@@ -1,29 +1,23 @@
-# Étape 1 : Construire l'application Angular
-FROM node:18 AS build
+# Utiliser une image Node.js
+FROM node:18
 
-# Définir un répertoire de travail absolu
+# Installer Angular CLI globalement
+RUN npm install -g @angular/cli
+
+# Définir le répertoire de travail
 WORKDIR /usr/src/app
 
-# Copier les fichiers package.json et package-lock.json dans le conteneur
+# Copier les fichiers package.json et package-lock.json
 COPY package.json package-lock.json ./
 
 # Installer les dépendances Angular
 RUN npm install
 
-# Copier le code source dans le conteneur
+# Copier le code source Angular dans le conteneur
 COPY . .
 
-# Construire l'application Angular pour la production
-RUN npm run build --prod
+# Exposer le port utilisé par `ng serve` (4200 par défaut)
+EXPOSE 4200
 
-# Étape 2 : Servir l'application Angular avec NGINX
-FROM nginx:latest
-
-# Copier les fichiers compilés d'Angular vers le répertoire HTML de NGINX
-COPY --from=build /usr/src/app/dist /usr/share/nginx/html
-
-# Exposer le port 80 pour accéder à l'application
-EXPOSE 80
-
-# Lancer NGINX
-CMD ["nginx", "-g", "daemon off;"]
+# Commande pour lancer Angular en mode développement
+CMD ["ng", "serve", "--host", "0.0.0.0"]
