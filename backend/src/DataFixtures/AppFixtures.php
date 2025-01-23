@@ -7,21 +7,40 @@ use App\Entity\Picture;
 use App\Entity\Reaction;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
 {
+    private UserPasswordHasherInterface $passwordHasher;
+
+    public function __construct(UserPasswordHasherInterface $passwordHasher)
+    {
+        $this->passwordHasher = $passwordHasher;
+    }
+
     public function load(ObjectManager $manager): void
     {
+        $users = [];
+
         // Créer des utilisateurs
         for ($i = 1; $i <= 5; $i++) {
             $user = new User();
             $user->setUsername("User$i");
-            $user->setPassword("password$i"); // Enregistrer le mot de passe en clair
+            $user->setPassword("password$i");
+            
+            // Définir les rôles
+            $roles = ['ROLE_USER'];
+            if ($i === 1) {
+                $roles[] = 'ROLE_ADMIN';
+            }
+            $user->setRoles($roles);
+
             $manager->persist($user);
             $users[] = $user;
         }
 
         // Créer des photos
+        $pictures = [];
         for ($i = 1; $i <= 10; $i++) {
             $picture = new Picture();
             $picture->setFilename("photo$i.jpg");
