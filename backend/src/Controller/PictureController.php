@@ -22,9 +22,6 @@ class PictureController extends AbstractController
                 'id' => $picture->getId(),
                 'filename' => $picture->getFilename(),
                 'path' => $picture->getPath(),
-                'width' => $picture->getWidth(),
-                'height' => $picture->getHeight(),
-                'createdAt' => $picture->getCreatedAt()?->format('Y-m-d H:i:s'),
             ];
         }
 
