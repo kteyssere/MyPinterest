@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Picture;
 use App\Entity\Reaction;
+use App\Entity\User;
 use App\Repository\ReactionRepository;
 use App\Repository\PictureRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -35,18 +36,19 @@ class ReactionController extends AbstractController
         return new JsonResponse($responseData);
     }
 
-    #[Route('/picture/{id}/react', name: 'create_or_update_reaction', methods: ['POST'])]
+    #[Route('/picture/{id}/react/user/{userId}', name: 'create_or_update_reaction', methods: ['POST'])]
     public function createOrUpdateReaction(
         int $id,
+        int $userId,
         Request $request,
         PictureRepository $pictureRepository,
         ReactionRepository $reactionRepository,
         EntityManagerInterface $entityManager
     ): JsonResponse {
-        // Vérifier si l'utilisateur est authentifié
-        $user = $this->getUser();
+        // Récupérer l'utilisateur par son ID
+        $user = $entityManager->getRepository(User::class)->find($userId);
         if (!$user) {
-            return new JsonResponse(['error' => 'Unauthorized'], JsonResponse::HTTP_UNAUTHORIZED);
+            return new JsonResponse(['error' => 'User not found'], JsonResponse::HTTP_NOT_FOUND);
         }
 
         // Récupérer l'image sur laquelle réagir
