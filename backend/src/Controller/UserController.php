@@ -14,22 +14,19 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserController extends AbstractController
 {
     #[Route('/register', name: 'user_register', methods: ['POST'])]
     public function register(
         Request $request,
-        UserPasswordHasherInterface $passwordHasher,
         EntityManagerInterface $entityManager
     ): Response {
         $data = json_decode($request->getContent(), true);
 
         $user = new User();
-        $user->setEmail($data['email']);
-        $user->setPassword($passwordHasher->hashPassword($user, $data['password']));
         $user->setUsername($data['username']);
+        $user->setPassword($data['password']); // Mot de passe enregistré en clair (pas recommandé en production)
 
         $entityManager->persist($user);
         $entityManager->flush();
@@ -57,11 +54,20 @@ class UserController extends AbstractController
 
         $responseData = [];
         foreach ($pictures as $picture) {
+            $likes = count(array_filter(
+                $picture->getReactions()->toArray(),
+                fn($reaction) => $reaction->isLikeReaction()
+            ));
+            $dislikes = count(array_filter(
+                $picture->getReactions()->toArray(),
+                fn($reaction) => $reaction->isDislikeReaction()
+            ));
+
             $responseData[] = [
                 'id' => $picture->getId(),
                 'filename' => $picture->getFilename(),
-                'likes' => count(array_filter($picture->getReactions()->toArray(), fn($reaction) => $reaction->isLike())),
-                'dislikes' => count(array_filter($picture->getReactions()->toArray(), fn($reaction) => $reaction->isDislike())),
+                'likes' => $likes,
+                'dislikes' => $dislikes,
             ];
         }
 
@@ -87,8 +93,8 @@ class UserController extends AbstractController
         }
 
         $data = json_decode($request->getContent(), true);
-        $like = $data['like'] ?? false;
-        $dislike = $data['dislike'] ?? false;
+        $like = $data['likeReaction'] ?? false;
+        $dislike = $data['dislikeReaction'] ?? false;
 
         if ($like && $dislike) {
             return new JsonResponse(['error' => 'Cannot like and dislike at the same time'], Response::HTTP_BAD_REQUEST);
@@ -101,8 +107,8 @@ class UserController extends AbstractController
             $reaction->setPicture($picture);
         }
 
-        $reaction->setLike($like);
-        $reaction->setDislike($dislike);
+        $reaction->setLikeReaction($like);
+        $reaction->setDislikeReaction($dislike);
 
         $entityManager->persist($reaction);
         $entityManager->flush();

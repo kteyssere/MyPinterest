@@ -27,9 +27,8 @@ class ReactionController extends AbstractController
                 'id' => $reaction->getId(),
                 'user' => $reaction->getUser()->getId(),
                 'picture' => $reaction->getPicture()->getId(),
-                'like' => $reaction->isLike(),
-                'dislike' => $reaction->isDislike(),
-                'createdAt' => $reaction->getCreatedAt()?->format('Y-m-d H:i:s'),
+                'likeReaction' => $reaction->isLikeReaction(),
+                'dislikeReaction' => $reaction->isDislikeReaction(),
             ];
         }
 
@@ -58,8 +57,8 @@ class ReactionController extends AbstractController
 
         // Récupérer les données envoyées dans la requête
         $data = json_decode($request->getContent(), true);
-        $like = $data['like'] ?? false;
-        $dislike = $data['dislike'] ?? false;
+        $like = $data['likeReaction'] ?? false;
+        $dislike = $data['dislikeReaction'] ?? false;
 
         // Validation : un utilisateur ne peut pas liker et disliker en même temps
         if ($like && $dislike) {
@@ -76,8 +75,8 @@ class ReactionController extends AbstractController
         }
 
         // Mettre à jour la réaction
-        $reaction->setLike($like);
-        $reaction->setDislike($dislike);
+        $reaction->setLikeReaction($like);
+        $reaction->setDislikeReaction($dislike);
 
         $entityManager->persist($reaction);
         $entityManager->flush();
