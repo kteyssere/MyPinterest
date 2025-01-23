@@ -2,13 +2,13 @@
 
 namespace App\Entity;
 
-use App\Repository\UserRepository;
+use App\Repository\PictureRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: UserRepository::class)]
-class User
+#[ORM\Entity(repositoryClass: PictureRepository::class)]
+class Picture
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -16,15 +16,15 @@ class User
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $username = null;
+    private ?string $filename = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $password = null;
+    private ?string $path = null;
 
     /**
      * @var Collection<int, Reaction>
      */
-    #[ORM\OneToMany(targetEntity: Reaction::class, mappedBy: 'user')]
+    #[ORM\OneToMany(targetEntity: Reaction::class, mappedBy: 'picture')]
     private Collection $reactions;
 
     public function __construct()
@@ -37,26 +37,26 @@ class User
         return $this->id;
     }
 
-    public function getUsername(): ?string
+    public function getFilename(): ?string
     {
-        return $this->username;
+        return $this->filename;
     }
 
-    public function setUsername(string $username): static
+    public function setFilename(string $filename): static
     {
-        $this->username = $username;
+        $this->filename = $filename;
 
         return $this;
     }
 
-    public function getPassword(): ?string
+    public function getPath(): ?string
     {
-        return $this->password;
+        return $this->path;
     }
 
-    public function setPassword(string $password): static
+    public function setPath(string $path): static
     {
-        $this->password = $password;
+        $this->path = $path;
 
         return $this;
     }
@@ -73,7 +73,7 @@ class User
     {
         if (!$this->reactions->contains($reaction)) {
             $this->reactions->add($reaction);
-            $reaction->setUser($this);
+            $reaction->setPicture($this);
         }
 
         return $this;
@@ -83,8 +83,8 @@ class User
     {
         if ($this->reactions->removeElement($reaction)) {
             // set the owning side to null (unless already changed)
-            if ($reaction->getUser() === $this) {
-                $reaction->setUser(null);
+            if ($reaction->getPicture() === $this) {
+                $reaction->setPicture(null);
             }
         }
 
