@@ -26,7 +26,10 @@ class AppFixtures extends Fixture
         for ($i = 1; $i <= 5; $i++) {
             $user = new User();
             $user->setUsername("User$i");
-            $user->setPassword("password$i");
+            
+            // Hasher le mot de passe
+            $hashedPassword = $this->passwordHasher->hashPassword($user, "password$i");
+            $user->setPassword($hashedPassword);
             
             // Définir les rôles
             $roles = ['ROLE_USER'];
