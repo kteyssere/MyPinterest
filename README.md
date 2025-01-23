@@ -16,3 +16,8 @@
 ```bash 
     docker-compose up --build  
 ```
+
+### Mettre à jour le conteneur dans le local 
+```bash
+    docker cp symfony-backend:/var/www/html/. ./backend
+```
