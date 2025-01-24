@@ -75,19 +75,18 @@ class ReactionController extends AbstractController
         return new JsonResponse($responseData, JsonResponse::HTTP_OK);
     }
 
-    #[Route('/picture/{id}/react/user/{userId}', name: 'create_or_update_reaction', methods: ['POST'])]
-    public function createOrUpdateReaction(
+    #[Route('/react/picture/{id}', name: 'create_or_update_reaction', methods: ['PUT'])]
+    public function updateReaction(
         int $id,
-        int $userId,
         Request $request,
         PictureRepository $pictureRepository,
         ReactionRepository $reactionRepository,
         EntityManagerInterface $entityManager
     ): JsonResponse {
-        // Récupérer l'utilisateur par son ID
-        $user = $entityManager->getRepository(User::class)->find($userId);
+        // Vérifier si l'utilisateur est authentifié
+        $user = $this->getUser();
         if (!$user) {
-            return new JsonResponse(['error' => 'User not found'], JsonResponse::HTTP_NOT_FOUND);
+            return new JsonResponse(['error' => 'Unauthorized'], JsonResponse::HTTP_UNAUTHORIZED);
         }
 
         // Récupérer l'image sur laquelle réagir
@@ -98,12 +97,11 @@ class ReactionController extends AbstractController
 
         // Récupérer les données envoyées dans la requête
         $data = json_decode($request->getContent(), true);
-        $like = $data['likeReaction'] ?? false;
-
-        // Validation : un utilisateur ne peut pas liker et disliker en même temps
-        if ($like && $dislike) {
-            return new JsonResponse(['error' => 'Cannot like and dislike at the same time'], JsonResponse::HTTP_BAD_REQUEST);
+        if (!isset($data['likeReaction'])) {
+            return new JsonResponse(['error' => 'Invalid data: likeReaction field is missing'], JsonResponse::HTTP_BAD_REQUEST);
         }
+
+        $like = (bool) $data['likeReaction'];
 
         // Vérifier si une réaction existe déjà
         $reaction = $reactionRepository->findOneBy(['user' => $user, 'picture' => $picture]);
@@ -120,6 +118,7 @@ class ReactionController extends AbstractController
         $entityManager->persist($reaction);
         $entityManager->flush();
 
-        return new JsonResponse(['message' => 'Reaction successfully updated']);
+        return new JsonResponse(['message' => 'Reaction successfully updated'], JsonResponse::HTTP_OK);
     }
+
 }
