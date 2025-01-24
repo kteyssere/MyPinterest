@@ -35,6 +35,7 @@ cd MyPinterest
 #### Etape 3 : Configurez la base de données
 ```bash
     docker exec -it symfony-backend bash
+    composer require --dev doctrine/doctrine-fixtures-bundle
     php bin/console make:migration
     php bin/console doctrine:migrations:migrate
     php bin/console doctrine:fixtures:load
