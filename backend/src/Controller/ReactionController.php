@@ -29,11 +29,50 @@ class ReactionController extends AbstractController
                 'user' => $reaction->getUser()->getId(),
                 'picture' => $reaction->getPicture()->getId(),
                 'likeReaction' => $reaction->isLikeReaction(),
-                'dislikeReaction' => $reaction->isDislikeReaction(),
             ];
         }
 
         return new JsonResponse($responseData);
+    }
+
+    #[Route('/pictures-with-reactions', name: 'get_pictures_with_reactions', methods: ['GET'])]
+    public function getPicturesWithReactions(
+        PictureRepository $pictureRepository,
+        ReactionRepository $reactionRepository
+    ): JsonResponse {
+        // Vérifier si l'utilisateur est authentifié
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse(['error' => 'Unauthorized'], JsonResponse::HTTP_UNAUTHORIZED);
+        }
+
+        // Récupérer toutes les photos
+        $pictures = $pictureRepository->findAll();
+
+        // Construire la réponse avec les photos et les réactions de l'utilisateur
+        $responseData = [];
+        foreach ($pictures as $picture) {
+            // Chercher la réaction de l'utilisateur sur chaque photo
+            $reaction = $reactionRepository->findOneBy([
+                'user' => $user,
+                'picture' => $picture,
+            ]);
+        
+            if (!$reaction) {
+                error_log("No reaction found for picture ID {$picture->getId()} and user ID {$user->getId()}");
+            }
+        
+            $responseData[] = [
+                'id' => $picture->getId(),
+                'filename' => $picture->getFilename(),
+                'path' => $picture->getPath(),
+                'isLike' => $reaction ? [
+                    'like' => $reaction->isLikeReaction(),
+                ] : null,
+            ];
+        }        
+
+        return new JsonResponse($responseData, JsonResponse::HTTP_OK);
     }
 
     #[Route('/picture/{id}/react/user/{userId}', name: 'create_or_update_reaction', methods: ['POST'])]
@@ -60,7 +99,6 @@ class ReactionController extends AbstractController
         // Récupérer les données envoyées dans la requête
         $data = json_decode($request->getContent(), true);
         $like = $data['likeReaction'] ?? false;
-        $dislike = $data['dislikeReaction'] ?? false;
 
         // Validation : un utilisateur ne peut pas liker et disliker en même temps
         if ($like && $dislike) {
@@ -78,7 +116,6 @@ class ReactionController extends AbstractController
 
         // Mettre à jour la réaction
         $reaction->setLikeReaction($like);
-        $reaction->setDislikeReaction($dislike);
 
         $entityManager->persist($reaction);
         $entityManager->flush();

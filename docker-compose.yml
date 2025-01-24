@@ -19,6 +19,8 @@ services:
       - "4200:4200" # Pour mode dev
     depends_on:
       - backend
+    volumes:
+      - ./backend:/var/www/html
 
   db:
     image: mysql

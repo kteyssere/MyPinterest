@@ -1,10 +1,7 @@
 <?php
-
 namespace App\Entity;
 
 use App\Repository\ReactionRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ReactionRepository::class)]
@@ -15,17 +12,16 @@ class Reaction
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'reactions')]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'reactions')]
+    #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
-    #[ORM\ManyToOne(inversedBy: 'reactions')]
+    #[ORM\ManyToOne(targetEntity: Picture::class, inversedBy: 'reactions')]
+    #[ORM\JoinColumn(nullable: false)]
     private ?Picture $picture = null;
 
     #[ORM\Column]
     private ?bool $likeReaction = null;
-
-    #[ORM\Column]
-    private ?bool $dislikeReaction = null;
 
     public function getId(): ?int
     {
@@ -40,7 +36,6 @@ class Reaction
     public function setUser(?User $user): static
     {
         $this->user = $user;
-
         return $this;
     }
 
@@ -52,7 +47,6 @@ class Reaction
     public function setPicture(?Picture $picture): static
     {
         $this->picture = $picture;
-
         return $this;
     }
 
@@ -64,19 +58,6 @@ class Reaction
     public function setLikeReaction(bool $likeReaction): static
     {
         $this->likeReaction = $likeReaction;
-
-        return $this;
-    }
-
-    public function isDislikeReaction(): ?bool
-    {
-        return $this->dislikeReaction;
-    }
-
-    public function setDislikeReaction(bool $dislikeReaction): static
-    {
-        $this->dislikeReaction = $dislikeReaction;
-
         return $this;
     }
 }
