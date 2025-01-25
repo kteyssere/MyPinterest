@@ -26,10 +26,6 @@ export class LoginService {
     );
   }
 
-  /*logout(): void {
-    localStorage.removeItem('PHPSESSID');
-  }*/
-
   logout(): Observable<any> {
     return this.http.post<any>(
       'http://localhost:8000/logout',

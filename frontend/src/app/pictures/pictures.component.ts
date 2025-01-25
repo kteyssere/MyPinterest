@@ -47,4 +47,15 @@ export class PicturesComponent implements OnInit{
       }
     });
   }
+
+  reactToPicture(id:number, likeReaction:boolean){
+    console.log(id);
+    this.pictureService.reactToPicture(id, likeReaction).subscribe({
+        next: (data) => {window.location.reload();},
+        error: (error) => {
+            console.error('Error while reacting to picture:', error);
+        }
+      }
+    );
+  }
 }

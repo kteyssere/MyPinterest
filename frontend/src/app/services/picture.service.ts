@@ -26,4 +26,8 @@ export class PictureService {
   getPictures(): Observable<Picture[]> {
     return this.http.get<Picture[]>(this.apiUrl+'-with-reactions', { withCredentials: true });
   }
+
+  reactToPicture(id:number, likeReaction:boolean): Observable<Picture[]> {
+    return this.http.put<Picture[]>('http://localhost:8000/react/picture/'+id, {id,likeReaction},{ withCredentials: true });
+  }
 }

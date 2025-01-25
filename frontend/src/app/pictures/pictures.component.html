@@ -5,9 +5,9 @@
       <mat-card-header>
         <img mat-card-image src="../../assets/uploads/photos/{{picture.filename}}" alt="" width="100%" height="100%">
       </mat-card-header>
-      <mat-card-actions *ngIf="picture.isLike.like; else notLiked">
-        <button  mat-raised-button aria-label="Like">
-          <mat-icon [color]="'warn'">favorite</mat-icon>
+      <mat-card-actions>
+        <button  mat-raised-button aria-label="Like" (click)="reactToPicture(picture.id, !picture.isLike.like)">
+          <mat-icon [color]="picture.isLike.like ? 'warn' : ''">favorite</mat-icon>
         </button>
       </mat-card-actions>
     </mat-card>
@@ -15,11 +15,6 @@
 <div>
   <ng-template #noPictures>
     <p>No pictures found.</p>
-  </ng-template>
-  <ng-template #notLiked>
-    <button  mat-raised-button aria-label="Like">
-      <mat-icon [color]="''">favorite</mat-icon>
-    </button>
   </ng-template>
 </div>
 </div>
