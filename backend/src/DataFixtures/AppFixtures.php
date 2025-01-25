@@ -58,10 +58,9 @@ class AppFixtures extends Fixture
                 $reaction->setUser($user);
                 $reaction->setPicture($picture);
                 $reaction->setLikeReaction(rand(0, 1) === 1);
-                $reaction->setDislikeReaction(rand(0, 1) === 0);
                 $manager->persist($reaction);
             }
-        }
+        }        
 
         // Enregistrer toutes les entités
         $manager->flush();

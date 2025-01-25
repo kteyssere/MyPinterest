@@ -29,26 +29,64 @@ class ReactionController extends AbstractController
                 'user' => $reaction->getUser()->getId(),
                 'picture' => $reaction->getPicture()->getId(),
                 'likeReaction' => $reaction->isLikeReaction(),
-                'dislikeReaction' => $reaction->isDislikeReaction(),
             ];
         }
 
         return new JsonResponse($responseData);
     }
 
-    #[Route('/picture/{id}/react/user/{userId}', name: 'create_or_update_reaction', methods: ['POST'])]
-    public function createOrUpdateReaction(
+    #[Route('/pictures-with-reactions', name: 'get_pictures_with_reactions', methods: ['GET'])]
+    public function getPicturesWithReactions(
+        PictureRepository $pictureRepository,
+        ReactionRepository $reactionRepository
+    ): JsonResponse {
+        // Vérifier si l'utilisateur est authentifié
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse(['error' => 'Unauthorized'], JsonResponse::HTTP_UNAUTHORIZED);
+        }
+
+        // Récupérer toutes les photos
+        $pictures = $pictureRepository->findAll();
+
+        // Construire la réponse avec les photos et les réactions de l'utilisateur
+        $responseData = [];
+        foreach ($pictures as $picture) {
+            // Chercher la réaction de l'utilisateur sur chaque photo
+            $reaction = $reactionRepository->findOneBy([
+                'user' => $user,
+                'picture' => $picture,
+            ]);
+        
+            if (!$reaction) {
+                error_log("No reaction found for picture ID {$picture->getId()} and user ID {$user->getId()}");
+            }
+        
+            $responseData[] = [
+                'id' => $picture->getId(),
+                'filename' => $picture->getFilename(),
+                'path' => $picture->getPath(),
+                'isLike' => $reaction ? [
+                    'like' => $reaction->isLikeReaction(),
+                ] : null,
+            ];
+        }        
+
+        return new JsonResponse($responseData, JsonResponse::HTTP_OK);
+    }
+
+    #[Route('/react/picture/{id}', name: 'create_or_update_reaction', methods: ['PUT'])]
+    public function updateReaction(
         int $id,
-        int $userId,
         Request $request,
         PictureRepository $pictureRepository,
         ReactionRepository $reactionRepository,
         EntityManagerInterface $entityManager
     ): JsonResponse {
-        // Récupérer l'utilisateur par son ID
-        $user = $entityManager->getRepository(User::class)->find($userId);
+        // Vérifier si l'utilisateur est authentifié
+        $user = $this->getUser();
         if (!$user) {
-            return new JsonResponse(['error' => 'User not found'], JsonResponse::HTTP_NOT_FOUND);
+            return new JsonResponse(['error' => 'Unauthorized'], JsonResponse::HTTP_UNAUTHORIZED);
         }
 
         // Récupérer l'image sur laquelle réagir
@@ -59,13 +97,11 @@ class ReactionController extends AbstractController
 
         // Récupérer les données envoyées dans la requête
         $data = json_decode($request->getContent(), true);
-        $like = $data['likeReaction'] ?? false;
-        $dislike = $data['dislikeReaction'] ?? false;
-
-        // Validation : un utilisateur ne peut pas liker et disliker en même temps
-        if ($like && $dislike) {
-            return new JsonResponse(['error' => 'Cannot like and dislike at the same time'], JsonResponse::HTTP_BAD_REQUEST);
+        if (!isset($data['likeReaction'])) {
+            return new JsonResponse(['error' => 'Invalid data: likeReaction field is missing'], JsonResponse::HTTP_BAD_REQUEST);
         }
+
+        $like = (bool) $data['likeReaction'];
 
         // Vérifier si une réaction existe déjà
         $reaction = $reactionRepository->findOneBy(['user' => $user, 'picture' => $picture]);
@@ -78,11 +114,11 @@ class ReactionController extends AbstractController
 
         // Mettre à jour la réaction
         $reaction->setLikeReaction($like);
-        $reaction->setDislikeReaction($dislike);
 
         $entityManager->persist($reaction);
         $entityManager->flush();
 
-        return new JsonResponse(['message' => 'Reaction successfully updated']);
+        return new JsonResponse(['message' => 'Reaction successfully updated'], JsonResponse::HTTP_OK);
     }
+
 }
