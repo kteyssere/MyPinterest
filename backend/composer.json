@@ -7,13 +7,14 @@
         "php": ">=8.2",
         "ext-ctype": "*",
         "ext-iconv": "*",
-        "doctrine/dbal": "^3",
-        "doctrine/doctrine-bundle": "^2.13",
+        "doctrine/dbal": "^3.9.4",
+        "doctrine/doctrine-bundle": "^2.13.2",
         "doctrine/doctrine-migrations-bundle": "^3.4",
-        "doctrine/orm": "^3.3",
+        "doctrine/orm": "^3.3.1",
+        "nelmio/cors-bundle": "^2.5",
         "symfony/console": "7.2.*",
         "symfony/dotenv": "7.2.*",
-        "symfony/flex": "^2",
+        "symfony/flex": "^2.4.7",
         "symfony/framework-bundle": "7.2.*",
         "symfony/password-hasher": "7.2.*",
         "symfony/runtime": "7.2.*",
@@ -22,8 +23,8 @@
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^4.0",
-        "fakerphp/faker": "^1.24",
-        "symfony/maker-bundle": "*"
+        "fakerphp/faker": "^1.24.1",
+        "symfony/maker-bundle": ">=1.62.1"
     },
     "config": {
         "allow-plugins": {

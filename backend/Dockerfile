@@ -25,6 +25,7 @@ WORKDIR /var/www/html
 COPY . .
 
 # Installer les dépendances Symfony
+RUN composer update
 RUN COMPOSER_ALLOW_SUPERUSER=1 composer install
 
 # Donner les permissions nécessaires
