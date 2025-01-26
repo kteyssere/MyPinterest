@@ -13,19 +13,21 @@ import {MatIcon} from "@angular/material/icon";
 import {HttpClientModule} from "@angular/common/http";
 import {Router, RouterLink} from "@angular/router";
 import {SharedService} from "../services/shared.service";
+import {MatProgressSpinner} from "@angular/material/progress-spinner";
 
 @Component({
   selector: 'app-register',
   standalone: true,
   imports: [ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatError, MatDatepickerInput,
     MatDatepickerModule, MatButtonModule, MatLabel, CommonModule, MatDatepickerModule, MatNativeDateModule, MatIcon, MatHint,
-    HttpClientModule, RouterLink],
+    HttpClientModule, RouterLink, MatProgressSpinner],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss'
 })
 export class RegisterComponent implements OnInit {
   registerForm: FormGroup;
   errorMessage: string | null = null;
+  isLoading: boolean = false;
   constructor(private fb: FormBuilder, private userService: UserService, private router: Router, private sharedService: SharedService) {
     this.registerForm = this.fb.group({
       username: ['', Validators.required],
@@ -43,19 +45,22 @@ export class RegisterComponent implements OnInit {
 
   // Soumettre le formulaire
   onSubmit(): void {
+    this.isLoading = true;
     if (this.registerForm.valid) {
-
       const newUser: User = this.registerForm.value;
       this.userService.register(newUser).subscribe({
         next: (response) => {
+          this.isLoading = false;
          this.router.navigateByUrl('/login');
         },
         error: (error) => {
+          this.isLoading = false;
             this.errorMessage = 'An unexpected error occurred. Please try again later.';
             console.error('Error while registering',error);
         }
       });
     } else {
+      this.isLoading = false;
       this.errorMessage = 'Please fill out the form correctly before submitting.';
       console.log('Invalid form');
     }
