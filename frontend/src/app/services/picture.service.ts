@@ -6,11 +6,11 @@ export interface Picture {
   id: number;
   filename: string;
   path: string;
-  isLike: IsLike;
+  isLike?: IsLike;
 }
 
 export interface IsLike {
-  like: boolean;
+  like?: boolean;
 }
 
 @Injectable({
@@ -25,5 +25,9 @@ export class PictureService {
 
   getPictures(): Observable<Picture[]> {
     return this.http.get<Picture[]>(this.apiUrl+'-with-reactions', { withCredentials: true });
+  }
+
+  reactToPicture(id:number, likeReaction:boolean): Observable<Picture[]> {
+    return this.http.put<Picture[]>('http://localhost:8000/react/picture/'+id, {id,likeReaction},{ withCredentials: true });
   }
 }

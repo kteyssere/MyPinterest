@@ -12,29 +12,29 @@ export interface User {
   providedIn: 'root'
 })
 
-export class LoginService {
+export class UserService {
 
-  private apiUrl = 'http://localhost:8000/login';
+  private apiUrl = 'http://localhost:8000/';
 
   constructor(private http: HttpClient) {}
 
-  login(username: string, password: string): Observable<any> {
+  login(user: User): Observable<any> {
     return this.http.post<any>(
-      this.apiUrl,
-      { username, password },
+      this.apiUrl+'login',
+      user,
       { withCredentials: true }
     );
   }
 
-  /*logout(): void {
-    localStorage.removeItem('PHPSESSID');
-  }*/
-
   logout(): Observable<any> {
     return this.http.post<any>(
-      'http://localhost:8000/logout',
+      this.apiUrl+'logout',
       {},
       { withCredentials: true }
     );
+  }
+
+  register(user: User): Observable<User> {
+    return this.http.post<User>(this.apiUrl+'register', user, { withCredentials: true });
   }
 }
