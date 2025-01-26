@@ -27,6 +27,8 @@ COPY . .
 # Installer les dépendances Symfony
 RUN COMPOSER_ALLOW_SUPERUSER=1 composer install
 RUN COMPOSER_ALLOW_SUPERUSER=1 composer update
+RUN COMPOSER_ALLOW_SUPERUSER=1 composer require nelmio/cors-bundle
+RUN COMPOSER_ALLOW_SUPERUSER=1 composer require --dev doctrine/doctrine-fixtures-bundle
 
 # Donner les permissions nécessaires
 RUN chown -R www-data:www-data /var/www/html \
