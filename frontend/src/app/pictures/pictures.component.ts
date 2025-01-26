@@ -15,11 +15,12 @@ import {MatButtonModule} from "@angular/material/button";
 import {SharedService} from "../services/shared.service";
 import {MatIcon} from "@angular/material/icon";
 import {Router} from "@angular/router";
+import {MatProgressSpinner} from "@angular/material/progress-spinner";
 
 @Component({
   selector: 'app-pictures',
   standalone: true,
-  imports: [MatListModule, CommonModule, MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardActions, MatButtonModule, MatIcon, MatCardImage, NgOptimizedImage],
+  imports: [MatListModule, CommonModule, MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardActions, MatButtonModule, MatIcon, MatCardImage, NgOptimizedImage, MatProgressSpinner],
 
   templateUrl: './pictures.component.html',
   styleUrl: './pictures.component.scss'
@@ -27,6 +28,7 @@ import {Router} from "@angular/router";
 
 export class PicturesComponent implements OnInit{
   pictures: Picture[] = [];
+  isLoading: boolean = false;
 
   constructor(private pictureService: PictureService, private sharedService: SharedService, private router: Router) {
 
@@ -49,9 +51,11 @@ export class PicturesComponent implements OnInit{
   }
 
   reactToPicture(id:number, likeReaction:boolean){
+    this.isLoading = true;
     this.pictureService.reactToPicture(id, likeReaction).subscribe({
         next: (data) => {
-          window.location.reload();
+          this.isLoading = false;
+          this.ngOnInit();
           },
         error: (error) => {
             console.error('Error while reacting to picture:', error);
