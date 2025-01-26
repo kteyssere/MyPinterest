@@ -31,15 +31,21 @@ cd MyPinterest
 ```bash 
     docker-compose up --build  
 ```
+##### Quelques dépendances dans le conteneur backend
+```bash
+    docker exec -it symfony-backend bash
+    composer require nelmio/cors-bundle
+    composer require --dev doctrine/doctrine-fixtures-bundle
+```
 
 #### Etape 3 : Configurez la base de données
 ```bash
-    docker exec -it symfony-backend bash
-    composer require --dev doctrine/doctrine-fixtures-bundle
     php bin/console make:migration
     php bin/console doctrine:migrations:migrate
     php bin/console doctrine:fixtures:load
 ```
+#### Vous pouvez maintenant essayer l'application avec les données qui ont été persistés ! Bravo !
+
 ## Choix technologiques et configurations Docker
 
 #### Choix technologiques
@@ -55,7 +61,7 @@ cd MyPinterest
 ```
     - Front
 ```bash
-    http://localhost:4200/
+    http://localhost:4200/login
 ```
     - Back
 ```bash
