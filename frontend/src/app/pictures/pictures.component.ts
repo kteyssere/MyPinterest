@@ -27,9 +27,9 @@ import {Router} from "@angular/router";
 
 export class PicturesComponent implements OnInit{
   pictures: Picture[] = [];
-  isLiked: Boolean;
+
   constructor(private pictureService: PictureService, private sharedService: SharedService, private router: Router) {
-    this.isLiked = false;
+
   }
 
   ngOnInit(): void {
@@ -49,9 +49,10 @@ export class PicturesComponent implements OnInit{
   }
 
   reactToPicture(id:number, likeReaction:boolean){
-    console.log(id);
     this.pictureService.reactToPicture(id, likeReaction).subscribe({
-        next: (data) => {window.location.reload();},
+        next: (data) => {
+          window.location.reload();
+          },
         error: (error) => {
             console.error('Error while reacting to picture:', error);
         }

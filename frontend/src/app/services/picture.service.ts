@@ -6,11 +6,11 @@ export interface Picture {
   id: number;
   filename: string;
   path: string;
-  isLike: IsLike;
+  isLike?: IsLike;
 }
 
 export interface IsLike {
-  like: boolean;
+  like?: boolean;
 }
 
 @Injectable({

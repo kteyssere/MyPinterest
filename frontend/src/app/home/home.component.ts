@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import { PicturesComponent } from '../pictures/pictures.component';
 import {MatDivider} from "@angular/material/divider";
 import {LoginComponent} from "../login/login.component";
-import {LoginService} from "../services/login.service";
+import {UserService} from "../services/user.service";
 import {Router} from "@angular/router";
 import {MatButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
@@ -16,7 +16,7 @@ import {MatIcon} from "@angular/material/icon";
 })
 export class HomeComponent implements OnInit{
 
-  constructor(private loginService: LoginService,
+  constructor(private userService: UserService,
               private router: Router) {}
 
   ngOnInit(): void {
@@ -24,7 +24,7 @@ export class HomeComponent implements OnInit{
   logout(): void {
     const confirmed = window.confirm('Êtes-vous sûr de vouloir vous déconnecter ?');
     if (confirmed) {
-      this.loginService.logout().subscribe({
+      this.userService.logout().subscribe({
         next: () => {
           console.log('Déconnecté avec succès');
           this.router.navigateByUrl('/login').then(() => {

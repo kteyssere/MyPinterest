@@ -6,8 +6,8 @@
         <img mat-card-image src="../../assets/uploads/photos/{{picture.filename}}" alt="" width="100%" height="100%">
       </mat-card-header>
       <mat-card-actions>
-        <button  mat-raised-button aria-label="Like" (click)="reactToPicture(picture.id, !picture.isLike.like)">
-          <mat-icon [color]="picture.isLike.like ? 'warn' : ''">favorite</mat-icon>
+        <button  mat-raised-button aria-label="Like" (click)="reactToPicture(picture.id, !((picture.isLike != undefined) && picture.isLike.like))">
+          <mat-icon [color]="(picture.isLike != undefined) && picture.isLike.like ? 'warn' : ''">favorite</mat-icon>
         </button>
       </mat-card-actions>
     </mat-card>

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {MatListModule} from '@angular/material/list';
 import {CommonModule, NgOptimizedImage} from '@angular/common';
 import {
@@ -12,45 +12,64 @@ import {
 import {MatButtonModule} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
-import {Router} from "@angular/router";
-import {LoginService} from "../services/login.service";
+import {Router, RouterLink} from "@angular/router";
+import {User, UserService} from "../services/user.service";
+import {MatError, MatFormField, MatLabel} from "@angular/material/form-field";
+import {MatInput} from "@angular/material/input";
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [MatListModule, CommonModule, MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardActions, MatButtonModule, MatIcon, MatCardImage, NgOptimizedImage, ReactiveFormsModule],
+  imports: [MatListModule, CommonModule, MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardActions, MatButtonModule, MatIcon, MatCardImage, NgOptimizedImage, ReactiveFormsModule, RouterLink, MatError, MatFormField, MatInput, MatLabel],
 
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
 
 
-export class LoginComponent {
+export class LoginComponent implements OnInit {
 
-  form:FormGroup;
-
+  loginForm:FormGroup;
+  errorMessage: string | null = null;
   constructor(private fb:FormBuilder,
-              private loginService: LoginService,
+              private userService: UserService,
               private router: Router) {
 
-    this.form = this.fb.group({
+    this.loginForm = this.fb.group({
       username: ['',Validators.required],
       password: ['',Validators.required]
     });
   }
 
-  login() {
-    const val = this.form.value;
+  ngOnInit(): void {
+    this.loginForm = this.fb.group({
+      username: ['', ],
+      password: ['', ]
+    });
 
-    if (val.username && val.password) {
-      this.loginService.login(val.username, val.password)
-        .subscribe(
-          () => {
-            this.router.navigateByUrl('/home').then(() => {
-              window.location.reload();
-            });
+  }
+
+  onSubmit() {
+    if (this.loginForm.valid) {
+      const loggedUser: User = this.loginForm.value;
+      this.userService.login(loggedUser)
+        .subscribe({
+            next: (response) => {
+              this.router.navigateByUrl('/home');
+            },
+            error: (error) => {
+              if(error.status == 401){
+                this.errorMessage = 'Invalid username or password.';
+              }else {
+                this.errorMessage = 'An unexpected error occurred. Please try again later.';
+                console.error('Error while login', error);
+              }
+            }
           }
         );
+    }else {
+      this.errorMessage = 'Please fill out the form correctly before submitting.';
+      console.log('Invalid form');
     }
   }
 }
